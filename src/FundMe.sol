@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
+
 import {PriceConverter} from "./PriceConverter.sol";
 
 error NotOwner();
 error NoMinimumFunds();
 
-contract FuneMe {
+contract FundMe {
     using PriceConverter for uint256;
 
     mapping(address => uint256) investersAmount;
@@ -33,7 +34,7 @@ contract FuneMe {
     }
 
     function withdraw() public owner_only {
-        for (uint index = 0; index <= investers.length; index++) {
+        for (uint256 index = 0; index <= investers.length; index++) {
             address invester = investers[index];
             investersAmount[invester] = 0;
         }
