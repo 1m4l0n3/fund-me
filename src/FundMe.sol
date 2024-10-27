@@ -14,7 +14,7 @@ contract FundMe {
     address[] investers;
     address public i_owner;
     address private s_priceFeedAddress;
-    uint256 public constant MINIMUM_USD = 5 * 10**18;
+    uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
 
     constructor(address priceFeedAddress) {
         i_owner = msg.sender;
@@ -43,16 +43,12 @@ contract FundMe {
         }
         investers = new address[](0);
 
-        (bool withdrawSuccess, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
+        (bool withdrawSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
         require(withdrawSuccess, "Withdraw Failed!");
     }
 
     function getVersion() public view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
-            s_priceFeedAddress
-        );
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeedAddress);
         return priceFeed.version();
     }
 }
