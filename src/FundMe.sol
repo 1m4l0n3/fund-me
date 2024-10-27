@@ -13,12 +13,12 @@ contract FundMe {
     mapping(address => uint256) investersAmount;
     address[] investers;
     address public i_owner;
-    AggregatorV3Interface private s_priceFeed;
+    address private s_priceFeedAddress;
     uint256 public constant MINIMUM_USD = 5 * 10**18;
 
     constructor(address priceFeedAddress) {
         i_owner = msg.sender;
-        s_priceFeed = AggregatorV3Interface(priceFeedAddress);
+        s_priceFeedAddress = priceFeedAddress;
     }
 
     function fund() public payable {
@@ -50,6 +50,7 @@ contract FundMe {
     }
 
     function getVersion() public view returns (uint256) {
-        return s_priceFeed.version();
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeedAddress);
+        return priceFeed.version();
     }
 }
