@@ -6,9 +6,11 @@ import {FundMe} from "../src/FundMe.sol";
 
 contract FuneMeTest is Test {
     FundMe public fundMe;
+    address private s_priceFeedAddress =
+        0x694AA1769357215DE4FAC081bf1f309aDC325306;
 
     function setUp() public {
-        fundMe = new FundMe();
+        fundMe = new FundMe(s_priceFeedAddress);
     }
 
     function testMinimumDollarIsFive() public {
