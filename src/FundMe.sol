@@ -22,7 +22,7 @@ contract FundMe {
     }
 
     function fund() public payable {
-        if (msg.value.getConversionRate() < MINIMUM_USD) {
+        if (msg.value.getConversionRate(s_priceFeedAddress) < MINIMUM_USD) {
             revert NoMinimumFunds();
         }
         if (investersAmount[msg.sender] == 0) {
@@ -50,7 +50,9 @@ contract FundMe {
     }
 
     function getVersion() public view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeedAddress);
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(
+            s_priceFeedAddress
+        );
         return priceFeed.version();
     }
 }
