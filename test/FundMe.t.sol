@@ -8,23 +8,21 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 contract FuneMeTest is Test {
     FundMe public fundMe;
     DeployFundMe public deployFundMe;
-    address private s_priceFeedAddress =
-        0x694AA1769357215DE4FAC081bf1f309aDC325306;
 
     function setUp() public {
         deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
     }
 
-    function testMinimumDollarIsFive() public {
+    function testMinimumDollarIsFive() public view {
         assertEq(fundMe.MINIMUM_USD(), 5e18);
     }
 
-    function testOwnerIsMsgSender() public {
+    function testOwnerIsMsgSender() public view {
         assertEq(fundMe.i_owner(), msg.sender);
     }
 
-    function testPriceFeedVersionIsAccurate() public {
+    function testPriceFeedVersionIsAccurate() public view {
         uint256 version = fundMe.getVersion();
         assertEq(version, 4);
     }
