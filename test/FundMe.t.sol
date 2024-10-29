@@ -8,14 +8,22 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 contract FuneMeTest is Test {
     FundMe public fundMe;
     DeployFundMe public deployFundMe;
-    address testUser = makeAddr('Joe');
+    address testUser = makeAddr("Joe");
     uint256 testMoney = 10 ether;
+    uint256 constant SEND_VALUE = 0.1 ether;
+
+    modifier funded() {
+        vm.prank(testUser);
+        fundMe.fund{value: SEND_VALUE}();
+        assert(address(fundMe).balance > 0);
+        _;
+    }
 
     function setUp() public {
         deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
 
-        deal(testUser,testMoney);
+        deal(testUser, testMoney);
     }
 
     function testMinimumDollarIsFive() public view {
@@ -36,14 +44,14 @@ contract FuneMeTest is Test {
         fundMe.fund();
     }
 
-    function testShouldUpdateFundersAmountWhenTheyFund() public {
-        uint256 amountBeforeFunding = fundMe.getFundedAmount(testUser);
-
-        vm.prank(testUser);
-        fundMe.fund{value: 0.1 ether}();
+    function testShouldUpdateFundersAmountWhenTheyFund() public funded {
         uint256 actualFundedAmount = fundMe.getFundedAmount(testUser);
-        uint256 expectedFundedAmount = amountBeforeFunding + 0.1 ether;
 
-        assertEq(expectedFundedAmount,actualFundedAmount);
+        assertEq(actualFundedAmount, SEND_VALUE);
+    }
+
+    function testShouldUpdateFunders() public funded {
+        address funder = fundMe.getFunder(0);
+        assertEq(funder, testUser);
     }
 }
