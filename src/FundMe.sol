@@ -11,8 +11,8 @@ contract FundMe {
     using PriceConverter for uint256;
 
     mapping(address => uint256) private s_investersAmount;
-    address[] s_investers;
-    address public i_owner;
+    address[] private s_investers;
+    address private i_owner;
     address private s_priceFeedAddress;
     uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
 
@@ -37,7 +37,7 @@ contract FundMe {
     }
 
     function withdraw() public owner_only {
-        for (uint256 index = 0; index <= s_investers.length; index++) {
+        for (uint256 index = 0; index < s_investers.length; index++) {
             address invester = s_investers[index];
             s_investersAmount[invester] = 0;
         }
@@ -50,6 +50,10 @@ contract FundMe {
     function getVersion() public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeedAddress);
         return priceFeed.version();
+    }
+
+    function getOwner() public view returns(address) {
+        return i_owner;
     }
 
     function getFundedAmount(address investerAddress) public view returns (uint256) {

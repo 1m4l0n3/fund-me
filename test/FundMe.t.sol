@@ -8,6 +8,7 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 contract FuneMeTest is Test {
     FundMe public fundMe;
     DeployFundMe public deployFundMe;
+    address i_owner;
     address testUser = makeAddr("Joe");
     uint256 testMoney = 10 ether;
     uint256 constant SEND_VALUE = 0.1 ether;
@@ -22,7 +23,7 @@ contract FuneMeTest is Test {
     function setUp() public {
         deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
-
+        i_owner = fundMe.getOwner();
         deal(testUser, testMoney);
     }
 
@@ -31,7 +32,7 @@ contract FuneMeTest is Test {
     }
 
     function testOwnerIsMsgSender() public view {
-        assertEq(fundMe.i_owner(), msg.sender);
+        assertEq(i_owner, msg.sender);
     }
 
     function testPriceFeedVersionIsAccurate() public view {
@@ -53,5 +54,29 @@ contract FuneMeTest is Test {
     function testShouldUpdateFunders() public funded {
         address funder = fundMe.getFunder(0);
         assertEq(funder, testUser);
+    }
+
+    function testWithdrawShouldFailWithNonOwner() public funded {
+        vm.prank(testUser);
+        vm.expectRevert();
+        fundMe.withdraw();
+    }
+
+    function testOwnerShouldWithdrawAllTheFunds() public {
+        uint256 noOfFunders = 10;
+        for( uint160 index = 1; index <= noOfFunders; index++){
+            hoax(address(index),SEND_VALUE);
+            fundMe.fund{value: SEND_VALUE}();
+        }
+
+        uint256 ownerMoneyBeforeWithdraw = i_owner.balance;
+        uint256 fundMeMoneyBeforeWithdraw = address(fundMe).balance;
+        vm.prank(i_owner);
+        fundMe.withdraw();
+        uint256 ownerMoneyAfterWithdraw = i_owner.balance;
+        uint256 fundMeMoneyAfterWithdraw = address(fundMe).balance;
+
+        assertEq(fundMeMoneyAfterWithdraw,0);
+        assertEq(ownerMoneyBeforeWithdraw + fundMeMoneyBeforeWithdraw, ownerMoneyAfterWithdraw);
     }
 }
