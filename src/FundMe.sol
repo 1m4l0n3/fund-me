@@ -52,7 +52,7 @@ contract FundMe {
         return priceFeed.version();
     }
 
-    function getAddressToAmountFunded(address investerAddress) public view returns (uint256) {
+    function getFundedAmount(address investerAddress) public view returns (uint256) {
         return s_investersAmount[investerAddress];
     }
 
