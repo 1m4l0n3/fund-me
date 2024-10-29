@@ -10,8 +10,8 @@ error NoMinimumFunds();
 contract FundMe {
     using PriceConverter for uint256;
 
-    mapping(address => uint256) investersAmount;
-    address[] investers;
+    mapping(address => uint256) private s_investersAmount;
+    address[] s_investers;
     address public i_owner;
     address private s_priceFeedAddress;
     uint256 public constant MINIMUM_USD = 5 * 10 ** 18;
@@ -25,10 +25,10 @@ contract FundMe {
         if (msg.value.getConversionRate(s_priceFeedAddress) < MINIMUM_USD) {
             revert NoMinimumFunds();
         }
-        if (investersAmount[msg.sender] == 0) {
-            investers.push(msg.sender);
+        if (s_investersAmount[msg.sender] == 0) {
+            s_investers.push(msg.sender);
         }
-        investersAmount[msg.sender] += msg.value;
+        s_investersAmount[msg.sender] += msg.value;
     }
 
     modifier owner_only() {
@@ -37,11 +37,11 @@ contract FundMe {
     }
 
     function withdraw() public owner_only {
-        for (uint256 index = 0; index <= investers.length; index++) {
-            address invester = investers[index];
-            investersAmount[invester] = 0;
+        for (uint256 index = 0; index <= s_investers.length; index++) {
+            address invester = s_investers[index];
+            s_investersAmount[invester] = 0;
         }
-        investers = new address[](0);
+        s_investers = new address[](0);
 
         (bool withdrawSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
         require(withdrawSuccess, "Withdraw Failed!");
@@ -51,4 +51,13 @@ contract FundMe {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeedAddress);
         return priceFeed.version();
     }
+
+    function getAddressToAmountFunded(address investerAddress) public view returns(uint256)  {
+        return s_investersAmount[investerAddress];
+    }
+
+    function getFunder(uint256 index) public view returns(address) {
+        return s_investers[index];
+    }
+    
 }
