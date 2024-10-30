@@ -12,6 +12,7 @@ contract FuneMeTest is Test {
     address testUser = makeAddr("Joe");
     uint256 testMoney = 10 ether;
     uint256 constant SEND_VALUE = 0.1 ether;
+    uint8 constant GAS_PRICE = 1;
 
     modifier funded() {
         vm.prank(testUser);
@@ -64,19 +65,19 @@ contract FuneMeTest is Test {
 
     function testOwnerShouldWithdrawAllTheFunds() public {
         uint256 noOfFunders = 10;
-        for( uint160 index = 1; index <= noOfFunders; index++){
-            hoax(address(index),SEND_VALUE);
+        for (uint160 index = 1; index <= noOfFunders; index++) {
+            hoax(address(index), SEND_VALUE);
             fundMe.fund{value: SEND_VALUE}();
         }
-
         uint256 ownerMoneyBeforeWithdraw = i_owner.balance;
         uint256 fundMeMoneyBeforeWithdraw = address(fundMe).balance;
+
         vm.prank(i_owner);
         fundMe.withdraw();
+
         uint256 ownerMoneyAfterWithdraw = i_owner.balance;
         uint256 fundMeMoneyAfterWithdraw = address(fundMe).balance;
-
-        assertEq(fundMeMoneyAfterWithdraw,0);
+        assertEq(fundMeMoneyAfterWithdraw, 0);
         assertEq(ownerMoneyBeforeWithdraw + fundMeMoneyBeforeWithdraw, ownerMoneyAfterWithdraw);
     }
 }
