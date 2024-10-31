@@ -2,8 +2,8 @@
 pragma solidity 0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
-import {FundMe} from "../src/FundMe.sol";
-import {DeployFundMe} from "../script/DeployFundMe.s.sol";
+import {FundMe} from "../../src/FundMe.sol";
+import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 
 contract FuneMeTest is Test {
     FundMe public fundMe;
@@ -78,6 +78,9 @@ contract FuneMeTest is Test {
         uint256 ownerMoneyAfterWithdraw = i_owner.balance;
         uint256 fundMeMoneyAfterWithdraw = address(fundMe).balance;
         assertEq(fundMeMoneyAfterWithdraw, 0);
-        assertEq(ownerMoneyBeforeWithdraw + fundMeMoneyBeforeWithdraw, ownerMoneyAfterWithdraw);
+        assertEq(
+            ownerMoneyBeforeWithdraw + fundMeMoneyBeforeWithdraw,
+            ownerMoneyAfterWithdraw
+        );
     }
 }
